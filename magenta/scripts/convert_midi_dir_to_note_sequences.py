@@ -38,7 +38,7 @@ tf.app.flags.DEFINE_string('output_file', None,
                            'Path to output TFRecord file. Will be overwritten '
                            'if it already exists.')
 tf.app.flags.DEFINE_bool('recursive', False,
-                         'Whether or not to recurse into subdirectories.')
+                         'Whether or not to navigate into subdirectories.')
 
 
 def convert_directory(root_dir, sub_dir, sequence_writer, recursive=False):
@@ -62,14 +62,14 @@ def convert_directory(root_dir, sub_dir, sequence_writer, recursive=False):
   Returns:
     The number of NoteSequence protos written as an integer.
   """
-  dir_to_convert = os.path.join(root_dir, sub_dir)
-  tf.logging.info("Converting MIDI files in '%s'.", dir_to_convert)
-  files_in_dir = tf.gfile.ListDirectory(os.path.join(dir_to_convert))
+  convert_dir = os.path.join(root_dir, sub_dir)
+  tf.logging.info("Converting MIDI files in '%s'.", convert_dir)
+  files_in_dir = tf.gfile.ListDirectory(os.path.join(convert_dir))
   recurse_sub_dirs = []
   sequences_written = 0
   sequences_skipped = 0
   for file_in_dir in files_in_dir:
-    full_file_path = os.path.join(dir_to_convert, file_in_dir)
+    full_file_path = os.path.join(convert_dir, file_in_dir)
     if tf.gfile.IsDirectory(full_file_path):
       if recursive:
         recurse_sub_dirs.append(os.path.join(sub_dir, file_in_dir))
@@ -87,7 +87,7 @@ def convert_directory(root_dir, sub_dir, sequence_writer, recursive=False):
     sequence_writer.write(sequence)
     sequences_written += 1
   tf.logging.info("Converted %d MIDI files in '%s'.", sequences_written,
-                  dir_to_convert)
+                  convert_dir)
   tf.logging.info("Coult not parse %d MIDI files.", sequences_skipped)
   for recurse_sub_dir in recurse_sub_dirs:
     sequences_written += convert_directory(
